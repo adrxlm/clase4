@@ -1,37 +1,60 @@
 const models = require("../model");
 const createError = require("../modules/create-error");
+const express = require("express");
+const router = express.Router();
 
-exports.list = (req, res, next) => {
+const list = (req, res, next) => {
   models.category
     .getAll()
     .then(categories => res.json(categories))
     .catch(err => next(createError(500, "internal server error", err.message)));
 };
 
-exports.get = (req, res, next) => {
+// const list = (req, res) => {
+// models.category
+//   .getAll()
+//   .then(categories => res.json(categories))
+//   .catch(err => res.status(500).json({ err }));
+// };
+
+const get = (req, res, next) => {
   models.category
     .getById(req.params.id)
     .then(category => res.json(category))
     .catch(err => next(createError(500, "internal server error", err.message)));
 };
 
-exports.create = (req, res, next) => {
+const create = (req, res, next) => {
   models.category
     .add(req.body)
     .then(category => res.status(201).json(category))
     .catch(err => next(createError(500, "internal server error", err.message)));
 };
 
-exports.update = (req, res, next) => {
+const update = (req, res, next) => {
   models.category
     .update(req.body)
     .then(category => res.json(category))
     .catch(err => next(createError(500, "internal server error", err.message)));
 };
 
-exports.remove = (req, res, next) => {
+const remove = (req, res, next) => {
   models.category
     .remove(req.params.id)
     .then(() => res.sendStatus(200))
     .catch(err => next(createError(500, "internal server error", err.message)));
 };
+
+
+// router.get("/?:id", get);
+// router.get("/:id", update);
+// router.get("/:id/:otro", update);
+router.get("/", list);
+router.post("/", create);
+router.get("/:id", get);
+// Por el momento vamos a usar el mismo método
+router.put("/:id", update);
+router.patch("/:id", update);
+router.delete("/:id", remove);
+
+module.exports = router;
