@@ -1,35 +1,29 @@
-const models = require("../model");
-const createError = require("../modules/create-error");
 const express = require("express");
 const router = express.Router();
 
-const list = (req, res, next) => {
+const models = require("../model");
+const createError = require("../modules/create-error");
+
+router.get("/", (req, res, next) => {
   models.category
     .getAll()
     .then(categories => res.json(categories))
     .catch(err => next(createError(500, "internal server error", err.message)));
-};
+});
 
-// const list = (req, res) => {
-// models.category
-//   .getAll()
-//   .then(categories => res.json(categories))
-//   .catch(err => res.status(500).json({ err }));
-// };
-
-const get = (req, res, next) => {
+router.get("/:id", (req, res, next) => {
   models.category
     .getById(req.params.id)
     .then(category => res.json(category))
     .catch(err => next(createError(500, "internal server error", err.message)));
-};
+});
 
-const create = (req, res, next) => {
+router.post("/", (req, res, next) => {
   models.category
     .add(req.body)
     .then(category => res.status(201).json(category))
     .catch(err => next(createError(500, "internal server error", err.message)));
-};
+});
 
 const update = (req, res, next) => {
   models.category
@@ -37,24 +31,14 @@ const update = (req, res, next) => {
     .then(category => res.json(category))
     .catch(err => next(createError(500, "internal server error", err.message)));
 };
+router.put("/:id", update);
+router.patch("/:id", update);
 
-const remove = (req, res, next) => {
+router.delete("/:id", (req, res, next) => {
   models.category
     .remove(req.params.id)
     .then(() => res.sendStatus(200))
     .catch(err => next(createError(500, "internal server error", err.message)));
-};
-
-
-// router.get("/?:id", get);
-// router.get("/:id", update);
-// router.get("/:id/:otro", update);
-router.get("/", list);
-router.post("/", create);
-router.get("/:id", get);
-// Por el momento vamos a usar el mismo método
-router.put("/:id", update);
-router.patch("/:id", update);
-router.delete("/:id", remove);
+});
 
 module.exports = router;
